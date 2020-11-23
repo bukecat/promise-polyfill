@@ -1,4 +1,4 @@
-class Promise {
+class PromisePolyfill {
   constructor(executor) {
     this.state = 'pending';
 
@@ -9,7 +9,9 @@ class Promise {
     this.onRejectedCallbacks = [];
 
     let resolve = value => {
+      console.log(3);
       if (this.state === 'pending') {
+        console.log(4);
         this.state = 'fulfilled';
 
         this.value = value;
@@ -29,6 +31,7 @@ class Promise {
     };
 
     try {
+      console.log(1);
       executor(resolve, reject)
     } catch (err) {
       reject(err);
@@ -37,10 +40,11 @@ class Promise {
 
 
   then(onFulfilled, onRejected) {
+    console.log(5);
     onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
     onRejected = typeof onRejected === 'function' ? onRejected : err => { throw err };
 
-    let promise2 = new Promise((resolve, reject) => {
+    let promise2 = new PromisePolyfill((resolve, reject) => {
       if (this.state === 'pending') {
         this.onResolvedCallbacks.push(() => {
           setTimeout(() => {
@@ -66,6 +70,7 @@ class Promise {
       }
 
       if (this.state === 'fulfilled') {
+        console.log(6);
         setTimeout(() => {
           try {
             let x = onFulfilled(this.value);
@@ -127,9 +132,12 @@ function resolvePromise(promise2, x, resolve, reject) {
       reject(e);
     }
   } else {
+    console.log(8);
     resolve(x);
   }
 }
+
+module.exports = PromisePolyfill;
 
 
 
