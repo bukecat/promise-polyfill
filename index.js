@@ -95,6 +95,34 @@ class PromisePolyfill {
 
     return promise2;
   }
+
+  static resolve(item) {
+    if (item instanceof PromisePolyfill) {
+      return item;
+    }
+
+    return new PromisePolyfill((_resolve) => {
+      _resolve(item);
+    });
+  }
+
+  static all(arr) {
+    const result = [];
+    let count = 0
+    return new PromisePolyfill((_resolve, _reject) => {
+      arr.forEach((item, index) => {
+        PromisePolyfill.resolve(item).then((val) => {
+          result[index] = val;
+          count++;
+          if (index === arr.length) {
+            _resolve(result)
+          }
+        }, (e) => {
+          _reject(e);
+        })
+      })
+    })
+  }
 }
 
 function resolvePromise(promise2, x, resolve, reject) {
